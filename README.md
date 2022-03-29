@@ -28,6 +28,6 @@ _Возьмите задачи SST-2, RTE и CoLA из GLUE и обучите н
 
 <code>jupyter notebook</code> / <code>jupyter lab</code>
 
-6\. Открыть ноутбук <code>Run_Experiments.ipynbb</code>
+6\. Открыть ноутбук <code>Run_Experiments.ipynbb</code> и запустить ячейки
 
 
