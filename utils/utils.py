@@ -7,6 +7,12 @@ from torch.utils.data import TensorDataset, DataLoader, RandomSampler
 
 
 def rephrase(sentence):
+    """Translates a sentence to a random language (german, spanish, rusian, french, chinese) and back to
+        get the reformulated sentence for augmentation.
+
+        Arg:
+            sentence: english sentence we want to reformulate
+    """
     languages = ["de", "es", "ru", "fr", "zh-TW"]
     random_language = np.random.choice(languages)
     translator1 = GoogleTranslator(source='en', target=random_language)
@@ -15,6 +21,13 @@ def rephrase(sentence):
 
 
 def augment_data(data, key, proportion):
+    """Selects sentences for reformulation and reformulate them. These sentences are added to the datasets.
+
+        Args:
+            data: train dataset
+            key: name of the GLUE task (cola, rte)
+            proportion: fraction of sentences that will be taken to reformulate
+    """
     n = len(data["idx"])
     ids = [i for i in range(n)]
     random_ids = np.random.choice(ids, size = int(n * proportion))
@@ -36,6 +49,21 @@ def augment_data(data, key, proportion):
 
 
 def prepare_data(datasets, subset_size = 1.0, mode = "singleHead", augmentation = False, augmentation_proportion = 0.25):
+    """Prepares data for training. 
+
+        Args:
+            datasets: dictionary of GLUE datasets with their names as keys
+            subset_size: fraction of data to be taken from datasets. Default: 1.0.
+            mode: name of method. One of ``singleHead``, ``multiHead``, ``singleTask``
+                * ``singleHead`` - method with shared encoder and 1 classifier for all tasks. 
+                    In this case we add labels of tasks (acceptability, sentiment, nli) to the sentances.
+                * ``multiHead`` - method with shared encoder and seperate classifier for each task.
+                * ``singleTask`` - method with the seperate model for the task
+                Default: ``singleHead``
+            augmentation: If ``True``, performs the augmentation. Default: ``False``
+            augmentation_proportion: fraction of sentences in the train dataset that will be taken to reformulate
+    """
+
     mode_types = ["singleHead", "multiHead", "singleTask"]
     assert mode in mode_types, f"mode should be one of {mode_types}"
     tags = {
@@ -68,6 +96,16 @@ def prepare_data(datasets, subset_size = 1.0, mode = "singleHead", augmentation 
 
 
 def create_dataloaders(data, batch_sizes = [8, 8, 8], model_name = "bert-base-uncased"):
+    """Creates dataloders for all tasks
+
+        Args:
+            data: prepared data in a form of dictionary of datasets for each task
+            batch_sizes: sizes for batch for train, validation, test datasets in a form of list
+                        Default: [8,8,8]
+            model_name: name of pretrained model to load tokenizer
+                        Default: ``bert-base-uncased``)
+
+    """
     dataloaders = {key : [] for key in data["cola"]}
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     for key in data:

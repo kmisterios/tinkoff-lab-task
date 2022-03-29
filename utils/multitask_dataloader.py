@@ -6,6 +6,12 @@ import random
 import torch
 
 class MultitaskDataLoader(torch.utils.data.DataLoader):
+    """Creates multitask dataloader, which gives batches without shaffling samples from different tasks
+
+        Args:
+            task_names: list of GLUE task names
+            datasets: list of dataloaders for each task
+    """
     def __init__(self, task_names, datasets):
         self.task_names = task_names
         self.lengths = {name : len(d) for name, d in zip(task_names, datasets)}

@@ -20,9 +20,27 @@ def evaluate(eval_dataloader,
              checkpoints_path, 
              config, 
              metric_funcs = {"cola" : matthews_corrcoef,"sst2" : accuracy_score,"rte" : accuracy_score},
-             method = MultiTaskBert):
+             finetune_model = MultiTaskBert):
+
+    """Evaluates the trained model. Weights are loaded from checkpoint.
+
+        Args:
+            eval_dataloader: evaluation singletask dataloader
+            pretrained_model: pretrained model
+            method_name: name of method to evaluate. One of ``SingleHeadMultitask``, ``MultiHeadMultitask``, 
+            ``cola_Singletask``, ``sst2_Singletask``, ``rte_Singletask``.
+                * ``SingleHeadMultitask`` - method with shared encoder and 1 classifier for all tasks.
+                * ``MultiHeadMultitask`` - method with shared encoder and seperate classifier for each task.
+                * ``cola_Singletask``, ``sst2_Singletask``, ``rte_Singletask`` - singletask models with seperate 
+                model for each task
+            checkpoints_path: path for checkpoints folder
+            config: configuration dictionary for chosen method
+            metric_funcs: dictionary of sklearn metric functions for the tasks. Default: ``matthews_corrcoef`` for
+            'cola' task and ``accuracy_score`` for other tasks
+            finetune_model: fine-tuning model. Default: ``MultiTaskBert`` provided in this repository
+    """
     
-    classifier = method(pretrained_model, config["linear_layer_size"], task_names=config["task_names"])
+    classifier = finetune_model(pretrained_model, config["linear_layer_size"], task_names=config["task_names"])
     classifier.load_state_dict(torch.load(f"{checkpoints_path}/model_best_{method_name}_{config['num_epochs']}.pth"))
     classifier.to(DEVICE)
     
@@ -57,6 +75,27 @@ def train(train_dataloader,
           draw_graphs = True,
           finetune_model = MultiTaskBert
          ):
+
+    """Trains the model, evaluating the performance each epoch and creating checkpoints.
+
+        Args:
+            train_dataloader: training multitask dataloader
+            valid_dataloader: validation multitask dataloader
+            pretrained_model: pretrained model
+            config: configuration dictionary for chosen method
+            method_name: name of method to evaluate. One of ``SingleHeadMultitask``, ``MultiHeadMultitask``, 
+            ``cola_Singletask``, ``sst2_Singletask``, ``rte_Singletask``.
+                * ``SingleHeadMultitask`` - method with shared encoder and 1 classifier for all tasks.
+                * ``MultiHeadMultitask`` - method with shared encoder and seperate classifier for each task.
+                * ``cola_Singletask``, ``sst2_Singletask``, ``rte_Singletask`` - singletask models with seperate 
+                model for each task
+            checkpoints_path: path for checkpoints folder
+            metric_funcs: dictionary of sklearn metric functions for the tasks. Default: ``matthews_corrcoef`` for
+            'cola' task and ``accuracy_score`` for other tasks
+            draw_graphs: If ``True``, the loss and metrics evolution will be drawn each epoch. Default: ``True``
+            finetune_model: fine-tuning model. Default: ``MultiTaskBert`` provided in this repository
+    """
+
     classifier = finetune_model(pretrained_model, config["linear_layer_size"], task_names=config["task_names"])
     optimizer = AdamW(classifier.parameters(), lr=2e-5, eps = 1e-08)
     scheduler = LinearLR(optimizer, total_iters=3)
