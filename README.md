@@ -32,6 +32,6 @@ _Возьмите задачи SST-2, RTE и CoLA из GLUE и обучите н
 
 <code>jupyter notebook</code> / <code>jupyter lab</code>
 
-7\. Открыть ноутбук <code>Run_Experiments.ipynbb</code>, убедиться, что выбрано правильное ядро, и запустить ячейки
+7\. Открыть ноутбук <code>Run_Experiments.ipynb</code>, убедиться, что выбрано правильное ядро, и запустить ячейки
 
 
