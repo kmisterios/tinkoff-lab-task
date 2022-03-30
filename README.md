@@ -24,10 +24,14 @@ _Возьмите задачи SST-2, RTE и CoLA из GLUE и обучите н
 
 <code>python -m ipykernel install --user --name=myenv</code>
 
-5\. Запустить Jupyter Notebook или аналог
+5\. Создать папку в корне для сохранения весов модели
+
+<code>mkdir checkpoints</code>
+
+6\. Запустить Jupyter Notebook или аналог
 
 <code>jupyter notebook</code> / <code>jupyter lab</code>
 
-6\. Открыть ноутбук <code>Run_Experiments.ipynbb</code>, убедиться, что выбрано правильное ядро, и запустить ячейки
+7\. Открыть ноутбук <code>Run_Experiments.ipynbb</code>, убедиться, что выбрано правильное ядро, и запустить ячейки
 
 
